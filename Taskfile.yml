@@ -1,0 +1,54 @@
+version: '3'
+
+tasks:
+  build:docker:
+    desc: Rebuild (if changed) from docker compose
+    cmds:
+      - docker-compose build ui
+
+  build:node:
+    desc: Build node project inside Docker machine
+    cmds:
+      - task: exec:docker
+        vars: {CLI_ARGS: yarn build}
+
+  start:
+    desc: Restart (and rebuild if changed) from docker compose
+    cmds:
+      - docker-compose up -d ui
+    deps:
+      - build:docker
+
+  logs:
+    desc: Attach to docker compose logs for ui
+    cmds:
+      - docker-compose logs -f ui
+
+  start+logs:
+    desc: Alias for 'start' followed by 'logs'
+    cmds:
+      - task: start
+      - task: logs
+
+  destroy:
+    desc: Destroy image (one level)
+    cmds:
+      - docker-compose down --rmi local --remove-orphans
+
+  destroy:more:
+    desc: Destroy image (one level) and volumes
+    cmds:
+      - docker-compose down --rmi local -v --remove-orphans
+
+  lint:
+    desc: Lint files
+    cmds:
+      - task: exec:docker
+        vars: {CLI_ARGS: yarn lint}
+
+  exec:docker:
+    desc: Execute a command inside an new Docker container instance
+    cmds:
+      - docker-compose run --rm -T ui sh -c "{{.CLI_ARGS}}"
+    deps:
+      - build:docker

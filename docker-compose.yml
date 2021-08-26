@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  ui:
+    build: .
+    environment:
+      NODE_ENV: ${UI_NODE_ENV:-development}
+      VUE_APP_API_URL: ${API_URL:-http://localhost:8081}
+    volumes:
+      - .:/app
+      - node-modules:/app/node_modules
+    ports:
+      - ${PORT:-8080}:8080
+
+volumes:
+  node-modules:

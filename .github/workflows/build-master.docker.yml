@@ -1,0 +1,28 @@
+name: Build (master)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-ui:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking out
+        uses: actions/checkout@v2
+
+      - name: Install Taskfile
+        uses: arduino/setup-task@v1
+        with:
+          version: '3.x'
+
+      - name: Building Docker image
+        run: task build:docker
+
+      - name: Linting
+        run: task lint
+
+      - name: Building
+        run: task build:node
